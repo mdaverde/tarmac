@@ -10,7 +10,7 @@ struct thread_parker {
 };
 
 struct unpark_handle {
-	_Atomic int *futex;
+	_Atomic(int) *futex;
 };
 
 struct thread_parker tp_init()
@@ -44,8 +44,10 @@ struct unpark_handle tp_unpark(struct thread_parker *tp)
 	return handle;
 }
 
-int unpark(struct unpark_handle *uh)
+int uh_unpark(struct unpark_handle *uh)
 {
-	futex_wake(uh->futex);
+	if (futex_wake(uh->futex) == -1) {
+		perror("futex_wake unpark");
+	}
 	return 0;
 }

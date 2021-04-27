@@ -14,8 +14,6 @@ test: test.c
 	$(CC) $(CFLAGS) -o test ./test.c -lpthread
 	./test
 
-.PHONY: tst
-tst: test
 
 .PHONY: clean
 clean:

@@ -17,22 +17,34 @@
 	}  \
 
 
-void *thread_func() {
-	printf("hello from thread\n");
+void *child_thread_one_fn(void *tp) {
+	tp = (struct thread_parker *)tp;
+
+	tp_prepare_park(tp);
+	tp_park(tp);
+
+	return NULL;
+}
+
+void *child_thread_two_fn(void *tp) {
+	tp = (struct thread_parker *)tp;
+	sleep(2);
+	struct unpark_handle unparker = tp_unpark(tp);
+	uh_unpark(&unparker);
 	return NULL;
 }
 
 int test_thread_parker() {
-	int num_threads = 3;
-	pthread_t threads[num_threads];
+	pthread_t child_t1;
+	pthread_t child_t2;
 
-	for (int i = 0; i < num_threads; i++) {
-		pthread_create(&threads[i], NULL, thread_func, NULL);
-	}
+	struct thread_parker tp_1 = tp_init();
 
-	for (int i = 0; i < num_threads; i++) {
-		pthread_join(threads[i], NULL);
-	}
+	pthread_create(&child_t1, NULL, child_thread_one_fn, (void *)&tp_1);
+	pthread_create(&child_t2, NULL, child_thread_two_fn, (void *)&tp_1);
+
+	pthread_join(child_t1, NULL);
+	pthread_join(child_t2, NULL);
 
 	return TEST_SUCCESS;
 }
