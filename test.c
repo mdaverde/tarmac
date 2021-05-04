@@ -14,7 +14,7 @@
 		if (saved_result == TEST_SUCCESS) {                                                        \
 			printf("%s - success\n", test_name);                                                   \
 		} else if (saved_result == TEST_ERROR) {                                                   \
-			printf("%s - error\n", test_name);                                                     \
+			printf("%s - ERROR\n", test_name);                                                     \
 		} else {                                                                                   \
 			printf("%s - did not understand test response\n", test_name);                          \
 		}                                                                                          \
@@ -141,55 +141,6 @@ int test_atomic_compare_exchange_weak_ptr()
 	return TEST_SUCCESS;
 }
 
-int data_race_counter = 0;
-
-void *data_race_child_add(void *nil)
-{
-	for (int i = 0; i < 100; i++) {
-		data_race_counter = data_race_counter + 1;
-	}
-
-	return NULL;
-}
-
-void *data_race_child_sub(void *nil)
-{
-	for (int i = 0; i < 100; i++) {
-		data_race_counter = data_race_counter - 1;
-	}
-
-	return NULL;
-}
-
-// Brittle in the long run but works on my machine for now
-int test_force_data_race()
-{
-	int NUM_THREADS = 20;
-
-	for (int j = 0; j < 100; j++) {
-		data_race_counter = 0;
-
-		pthread_t adding_threads[NUM_THREADS];
-		pthread_t subtracting_threads[NUM_THREADS];
-
-		for (int i = 0; i < NUM_THREADS; i++) {
-			pthread_create(&adding_threads[i], NULL, data_race_child_add, NULL);
-			pthread_create(&subtracting_threads[i], NULL, data_race_child_sub, NULL);
-		}
-
-		for (int i = 0; i < NUM_THREADS; i++) {
-			pthread_join(adding_threads[i], NULL);
-			pthread_join(subtracting_threads[i], NULL);
-		}
-
-		if (data_race_counter != 0) {
-			return TEST_SUCCESS;
-		}
-	}
-
-	return TEST_ERROR;
-}
-
 int word_lock_counter = 0;
 
 void *word_lock_child_add(void *void_wl)
@@ -252,6 +203,5 @@ int main()
 	run_test("lock_state", test_lock_state());
 	run_test("access_thread_stack_data", test_access_thread_stack_data());
 	run_test("atomic_compare_exchange_weak_ptr", test_atomic_compare_exchange_weak_ptr());
-	run_test("force_data_race", test_force_data_race());
 	run_test("test_word_lock", test_word_lock());
 }

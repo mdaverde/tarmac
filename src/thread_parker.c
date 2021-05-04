@@ -29,7 +29,7 @@ int tp_prepare_park(struct thread_parker *tp)
 int tp_park(struct thread_parker *tp)
 {
 	while (atomic_load_explicit(&tp->futex, memory_order_acquire) != 0) {
-		if (futex_wait(&tp->futex, NULL) == -1) {
+		if (futex_wait(&tp->futex, NULL) == -1 && errno != EAGAIN) {
 			perror("tp_park futex_wait");
 		}
 	}
@@ -40,9 +40,7 @@ int tp_park(struct thread_parker *tp)
 struct unpark_handle tp_unpark(struct thread_parker *tp)
 {
 	atomic_store_explicit(&tp->futex, 0, memory_order_release);
-	struct unpark_handle uh = {
-		.futex = &tp->futex
-	};
+	struct unpark_handle uh = { .futex = &tp->futex };
 	return uh;
 }
 
