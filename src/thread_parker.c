@@ -40,8 +40,10 @@ int tp_park(struct thread_parker *tp)
 struct unpark_handle tp_unpark(struct thread_parker *tp)
 {
 	atomic_store_explicit(&tp->futex, 0, memory_order_release);
-	struct unpark_handle handle = { .futex = &tp->futex };
-	return handle;
+	struct unpark_handle uh = {
+		.futex = &tp->futex
+	};
+	return uh;
 }
 
 int uh_unpark(struct unpark_handle *uh)

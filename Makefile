@@ -1,21 +1,16 @@
 CC = gcc
-CFLAGS = -fPIC -Wall -Wextra -O2 -g
+DEV_CFLAGS = -fPIC -Wall -Wextra -O0 -g
 LDFLAGS = -shared
 OBJS = tarmac.o
 
 .PHONY: all
 all: ;
 
-tarmac: tarmac.c tarmac.h
-	$(CC) $(CFLAGS) -c tarmac.c
-
 .PHONY: test
 test: test.c
-	$(CC) $(CFLAGS) -o test ./test.c -lpthread
+	$(CC) $(DEV_CFLAGS) -o test ./test.c -lpthread
 	./test
-
+	rm ./test
 
 .PHONY: clean
-clean:
-	rm ./tarmac.o
-	rm ./test.o
+clean: ;

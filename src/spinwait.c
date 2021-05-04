@@ -1,12 +1,17 @@
-
 #include <stdbool.h>
-#include "./thread.c"
+#if defined(__x86_64__)
+#include <immintrin.h>
+#endif
+#include "thread.c"
 
 void cpu_spin(volatile int iterations)
 {
 	int i = 0;
 	while (i < iterations) {
 		i++;
+#if defined(__x86_64__)
+		_mm_pause();
+#endif
 	}
 }
 
