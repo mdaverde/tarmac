@@ -1,13 +1,17 @@
 <div align="center">
 	<h1>tarmac</h1>
 	<p>
-        A (WIP) concurrency toolbox based on linux <a href="https://man7.org/linux/man-pages/man7/futex.7.html">futexes</a>
+        A (WIP) thread concurrency toolbox based on linux <a href="https://man7.org/linux/man-pages/man7/futex.7.html">futexes</a>
 	</p>
 	<br>
 </div>
 
-## Status
+Roadmap is to add support for the common lock constructs (mutexes, condvars, rwlocks etc.) yet eventually adding lockless patterns
 
-Focused on linux OS threads (NPTL) data structures with the intention of supporting processes and coroutines in the future
+Currently being developed on linux x86_64
+
+
+
+
 
 
